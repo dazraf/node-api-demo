@@ -1,0 +1,19 @@
+{
+  "name": "node-api-demo",
+  "version": "1.0.0",
+  "description": "simple demo for Oliver",
+  "main": "app.js",
+  "private": true,
+  "scripts": {
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "farzad.pezeshkpour@gmail.com",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.15.3"
+  },
+  "engines": {
+    "node": ">=4.3.2"    
+  }
+}
