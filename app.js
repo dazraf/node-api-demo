@@ -1,18 +1,17 @@
 'use strict';
 
 const express = require('express');
-var path = require('path');
+const path = require('path');
+const bodyParser = require('body-parser')
 const app = express();
+app.use( bodyParser.json() );
+app.use(bodyParser.urlencoded({     
+  // support URL-encoded bodies
+  extended: true
+})); 
+var nextId = 1;
 
-const wallets = {
-  "w1": {
-    "id": "w1",
-    "name": "Oliver",
-    "balance": 100000,
-    "account": "11223344",
-    "sortCode": "112233"
-  }
-};
+const wallets = {};
 
 // retrieve intro screen
 app.get('/', (req, res) => {
@@ -20,16 +19,35 @@ app.get('/', (req, res) => {
 });
 
 // retrieve existing wallets
-app.get('/wallets', (req, res) => {
-  sendJson(res, wallets)
+app.get('/api/wallets', (req, res) => {
+  var response = Array.from(Object.keys(wallets)).map(function (it) {
+    return {
+      id: it,
+      link: "/api/wallets/" + it
+    }
+  })
+  sendJson(res, response);
 });
 
-app.get('/wallets/:wallet', (req, res) => {
+app.get('/api/wallets/:wallet', (req, res) => {
   var wallet = req.params.wallet;
   if (wallet in wallets) {
     sendJson(res, wallets[wallet])
   } else {
     sendError(res, "wallet not found: " + wallet)
+  }
+});
+
+app.post('/api/wallets', (req, res) => {
+  var wallet = req.body;
+  try {
+    var name = getProperty(wallet, 'name');
+    var sortCode = getProperty(wallet, 'sortCode');
+    var account = getProperty(wallet, 'account');  
+    var response = createWallet(name, account, sortCode);
+    sendJson(res, response);
+  } catch (err) {
+    sendError(err)
   }
 });
 
@@ -54,4 +72,27 @@ function sendError(res, msg) {
   res.status(500, msg).send(msg)
 }
 
+function createWallet(name, account, sortCode) {
+  var id = "w" + nextId++;
+  var wallet = {
+    id: id,
+    name: name,
+    account: account,
+    sortCode: sortCode,
+    balance: 0,
+    link: "/api/wallets/" + id
+  };
+  wallets[id] = wallet;
+  return wallet;
+}
+
+function getProperty(obj, property) {
+  if (obj.hasOwnProperty(property)) {
+    return obj[property]
+  } else {
+    throw "object doesn't have property: " + property
+  }
+}
+
+createWallet("Oliver", "11223344", "112233");
 module.exports = app;

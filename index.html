@@ -1,56 +1,153 @@
 <html>
 <header>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 </header>
+
 <body>
-  <div class="w3-card-4">
-    <header class="w3-container w3-blue">
-      <h1>Introduction</h1>
-    </header>
-    <div class="w3-container">
-      <p>
-        Hello, Oliver 😊 This is a simple demo how to setup and deploy a NodeJS service. 
-        It's only intended a skeleton, with zero business implementation.
-      </p>
-      <p>The source is here <a href="https://github.com/dazraf/node-api-demo">https://github.com/dazraf/node-api-demo</a> </p>
-    </div>
-    <header class="w3-container w3-blue">
-      <h2>Service API</h2> 
-    </header>
+  <div class="w3-container">
+    <div class="w3-panel w3-card">
       <div class="w3-container">
-      <ul class="w3-ul w3-border">
-        <li class="w3-li">
-          <code class="w3-codespan"><a href="/wallets">GET /wallets</a></code>
-          <p>This returns an object mapping the "wallet" id to a wallet structure.</p>
-          <h4>Example:</h4>
-          <div class="w3-code jsHigh">
-            {
-              "w1": {
-                "id":"w1",
-                "name":"Oliver",
-                "balance":100000,
-                "account":"11223344",
-                "sortCode":"112233"
-              }
-            }
-          </div>
-        </li>
-        <li class="w3-li">
-          <code class="w3-codespan"><a href="/wallets/w1">GET wallets/:walletId</a></code>
-          <p>This the "wallet" object for the given <code>walletId</code>.</p>
-          <h4>Example:</h4>
-          <div class="w3-code jsHigh">
-              {
-                "id":"w1",
-                "name":"Oliver",
-                "balance":100000,
-                "account":"11223344",
-                "sortCode":"112233"
-              }
-          </div>
-        </li>
-      </ul>
+        <h1>Introduction</h1>
+        <p>
+          This is a simple demo how to setup and deploy a NodeJS service. It's only intended a skeleton, with zero business
+          implementation.
+        </p>
+        <p>The source is here <a href="https://github.com/dazraf/node-api-demo">https://github.com/dazraf/node-api-demo</a>          </p>
+      </div>
+    </div>
+    <div class="w3-panel w3-card">
+      <div class="w3-container">
+        <h1>Service API</h1>
+        <ul class="w3-ul">
+          <li class="w3-li">
+            <div class="w3-container">
+              <code class="w3-codespan"><a href="/api/wallets">GET /api/wallets</a></code>
+              <p>This returns an array of objects each containing the wallet id and a REST link to the wallet</p>
+              <h3>Example:</h3>
+              <pre class="w3-code">
+[
+  {
+    "id": "w1",
+    "link":
+    "/api/wallets/w1"
+  }
+]</pre>
+              <h3>Try It</h3>
+              <button class="w3-button w3-ripple w3-blue" onclick="onGetWallets()">Get Wallets!</button>
+              <pre id="walletsResult" style="display: none" class="w3-container w3-border w3-large"></pre>
+            </div>
+          </li>
+          <li class="w3-li">
+            <div class="w3-container">
+              <code class="w3-codespan">POST /api/wallets</a></code>
+              <p>Creates a new wallet. Requires a JSON body describing the account. All fields are required.</p>
+              <h3>Example Request</h3>
+              <pre class="w3-code">
+{
+  name: "Fuzz",
+  account: "11223344",
+  sortCode: "112233"
+}</pre>
+              <h3>Example Response</h3>
+              <pre class="w3-code">
+{
+  "id":"w2",
+  "name":"Fuzz",
+  "account":"11223344",
+  "sortCode":"112233",
+  "balance":0,
+  "link": "/api/wallets/w2"
+}</pre>
+              <h3>Try It</h3>
+              <form class="w3-container w3-light-grey" onsubmit="return onCreateWallet()">
+                <div class="w3-third">
+                  <label>Name</label>
+                  <input class="w3-input w3-border w3-round" type="text" placeholder="holder's name" id="walletName">
+                </div>
+                <div class="w3-third">
+                  <label>Bank SortCode</label>
+                  <input class="w3-input w3-border w3-round" type="text" placeholder="holder's bank sortcode" id="walletSortCode">
+                </div>
+                <div class="w3-third">
+                  <label>Bank Account</label>
+                  <input class="w3-input w3-border w3-round" type="text" placeholder="holder's bank account" id="walletAccount">
+                </div>
+                <input class="w3-button w3-ripple w3-blue" type="submit" value="Create Wallet">
+              </form>
+              <pre id="createWalletResult" style="display: none" class="w3-container w3-border w3-large"></pre>
+            </div>
+          </li>
+          <li class="w3-li">
+            <code class="w3-codespan"><a href="/api/wallets/w1">GET /api/wallets/:walletId</a></code>
+            <p>This the wallet object for the given <code>walletId</code>.</p>
+            <h3>Example Response:</h3>
+            <pre class="w3-code jsHigh">
+{ 
+  "id":"w1", 
+  "name":"Oliver", 
+  "account":"11223344", 
+  "sortCode":"112233",
+  "balance":10000, 
+  "link": "/api/wallets/w1"
+}          </pre>
+            <h3>Try It</h3>
+            <form class="w3-container w3-light-grey" onsubmit="return onGetWallet()">
+              <label>Wallet Id</label>
+              <input class="w3-input w3-border w3-round" type="text" value="w1" id="walletId">
+              <input class="w3-button w3-ripple w3-blue" type="submit" value="Get Wallet">
+            </form>
+            <pre id="getWalletResult" style="display: none" class="w3-container w3-border w3-large"></pre>
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
+  <script type="text/javascript">
+    'use strict';
+    function onGetWallets() {
+      console.log("getting wallets")
+      $.get("/api/wallets", function (data) { console.log(data); })
+        .done(function (data) {
+          console.log("done", data);
+          $("#walletsResult").text(JSON.stringify(data, null, 2)).css("display", "block");
+        })
+        .fail(function (err) {
+          console.error("error", err);
+        });
+    }
+    function onGetWallet() {
+      var walletId = $("#walletId").val();
+      console.log("getting wallet: " + walletId)
+      $.get("/api/wallets/" + walletId)
+        .done(function (data) {
+          console.log("done", data);
+          $("#getWalletResult").text(JSON.stringify(data, null, 2)).css("display", "block");
+        })
+        .fail(function (err) {
+          console.error("error", err);
+        });
+      return false;
+    }
+
+    function onCreateWallet() {
+      var data = {
+        name: $('#walletName').val(),
+        account: $('#walletAccount').val(),
+        sortCode: $('#walletSortCode').val()
+      }
+      $.post("/api/wallets", data, function (d) { })
+        .done(function (data) {
+          console.log('done', data);
+          $('#createWalletResult').text(JSON.stringify(data, null, 2)).css('display', 'block');
+        })
+        .fail(function (err) {
+          console.error('error', err);
+        });
+      return false;
+    }
+  </script>
 </body>
+
 </html>
