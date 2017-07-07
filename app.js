@@ -72,8 +72,10 @@ function sendJson(res, obj) {
   res.status(200).send(JSON.stringify(obj))
 }
 
-function sendError(res, msg) {
-  res.status(500, msg).send(msg)
+function sendError(res, err) {
+  let msg = "Error: " + JSON.stringify(err);
+  console.error(msg);
+  res.status(400, msg).send(msg)
 }
 
 function getAllwallets(res, list) {
