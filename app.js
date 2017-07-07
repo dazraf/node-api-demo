@@ -3,12 +3,15 @@
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser')
+const config = require('./config');
+const store = require('./store');
 const app = express();
-app.use( bodyParser.json() );
-app.use(bodyParser.urlencoded({     
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
   // support URL-encoded bodies
   extended: true
-})); 
+}));
 var nextId = 1;
 
 const wallets = {};
@@ -20,32 +23,33 @@ app.get('/', (req, res) => {
 
 // retrieve existing wallets
 app.get('/api/wallets', (req, res) => {
-  var response = Array.from(Object.keys(wallets)).map(function (it) {
-    return {
-      id: it,
-      link: "/api/wallets/" + it
-    }
-  })
-  sendJson(res, response);
+  getAllwallets(res, [], false);
 });
 
 app.get('/api/wallets/:wallet', (req, res) => {
-  var wallet = req.params.wallet;
-  if (wallet in wallets) {
-    sendJson(res, wallets[wallet])
-  } else {
-    sendError(res, "wallet not found: " + wallet)
-  }
+  let wallet = req.params.wallet;
+  store.read(wallet, (err, data) => {
+    if (err) {
+      sendError(res, err)
+    } else {
+      sendJson(res, addLink(data) );
+    }
+  });
 });
 
 app.post('/api/wallets', (req, res) => {
-  var wallet = req.body;
+  let wallet = req.body;
   try {
-    var name = getProperty(wallet, 'name');
-    var sortCode = getProperty(wallet, 'sortCode');
-    var account = getProperty(wallet, 'account');  
-    var response = createWallet(name, account, sortCode);
-    sendJson(res, response);
+    let name = getProperty(wallet, 'name');
+    let sortCode = getProperty(wallet, 'sortCode');
+    let account = getProperty(wallet, 'account');
+    let response = createWallet(name, account, sortCode, function (err, data) {
+      if (err == null) {
+        sendJson(res, data);
+      } else {
+        sendError(res, err);
+      }
+    });
   } catch (err) {
     sendError(err)
   }
@@ -54,7 +58,7 @@ app.post('/api/wallets', (req, res) => {
 if (module === require.main) {
   // [START server]
   // Start the server
-  var port = process.env.PORT || 8081;
+  let port = process.env.PORT || 8081;
   const server = app.listen(port, () => {
     const port = server.address().port;
     console.log(`App listening on port ${port}`);
@@ -72,18 +76,32 @@ function sendError(res, msg) {
   res.status(500, msg).send(msg)
 }
 
-function createWallet(name, account, sortCode) {
-  var id = "w" + nextId++;
-  var wallet = {
-    id: id,
+function getAllwallets(res, list) {
+  store.list(function (err, data, token) {
+    if (err != null) {
+      sendError(res, err);
+      return;
+    }
+
+    sendJson(res, data.map(addLink));
+  });
+}
+
+function addLink(it) {
+  it.link = "/api/wallets/" + it.id;
+  return it;
+}
+
+function createWallet(name, account, sortCode, cb) {
+  let wallet = {
     name: name,
     account: account,
     sortCode: sortCode,
-    balance: 0,
-    link: "/api/wallets/" + id
+    balance: 0
   };
-  wallets[id] = wallet;
-  return wallet;
+  store.create(wallet, function (err, data) {
+    cb(err, addLink(data));
+  });
 }
 
 function getProperty(obj, property) {
@@ -94,5 +112,4 @@ function getProperty(obj, property) {
   }
 }
 
-createWallet("Oliver", "11223344", "112233");
 module.exports = app;

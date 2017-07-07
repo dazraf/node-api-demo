@@ -1,0 +1,5 @@
+{
+  "GCLOUD_PROJECT": "node-api-demo",
+  "DATA_BACKEND": "datastore",
+  "CLOUD_BUCKET": "node-api-demo"
+}

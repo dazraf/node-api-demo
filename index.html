@@ -23,15 +23,16 @@
         <ul class="w3-ul">
           <li class="w3-li">
             <div class="w3-container">
+              <h2>Get Wallets</h2>
               <b><code class="w3-codespan"><a href="/api/wallets">GET /api/wallets</a></code></b>
               <p>This returns an array of objects each containing the wallet id and a REST link to the wallet</p>
               <h3>Example:</h3>
               <pre class="w3-code">
 [
   {
-    "id": "w1",
+    "id": "1",
     "link":
-    "/api/wallets/w1"
+    "/api/wallets/1"
   }
 ]</pre>
               <h3>Try It</h3>
@@ -41,6 +42,7 @@
           </li>
           <li class="w3-li">
             <div class="w3-container">
+              <h2>Create a Wallet</h2>
               <b><code class="w3-codespan">POST /api/wallets</a></code></b>
               <p>Creates a new wallet. Requires a JSON body describing the account. All fields are required.</p>
               <h3>Example Request</h3>
@@ -58,7 +60,7 @@
   "account":"11223344",
   "sortCode":"112233",
   "balance":0,
-  "link": "/api/wallets/w2"
+  "link": "/api/wallets/2"
 }</pre>
               <h3>Try It</h3>
               <form class="w3-container w3-light-grey" onsubmit="return onCreateWallet()">
@@ -80,22 +82,23 @@
             </div>
           </li>
           <li class="w3-li">
-            <b><code class="w3-codespan"><a href="/api/wallets/w1">GET /api/wallets/:walletId</a></code></b>
+            <h2>Retrieve wallet details</h2>
+            <b><code class="w3-codespan"><a href="/api/wallets/1">GET /api/wallets/:walletId</a></code></b>
             <p>This the wallet object for the given <code>walletId</code>.</p>
             <h3>Example Response:</h3>
             <pre class="w3-code jsHigh">
 { 
-  "id":"w1", 
+  "id":"1", 
   "name":"Oliver", 
   "account":"11223344", 
   "sortCode":"112233",
   "balance":10000, 
-  "link": "/api/wallets/w1"
+  "link": "/api/wallets/1"
 }          </pre>
             <h3>Try It</h3>
             <form class="w3-container w3-light-grey" onsubmit="return onGetWallet()">
               <label>Wallet Id</label>
-              <input class="w3-input w3-border w3-round" type="text" value="w1" placeholder="wallet ID" id="walletId">
+              <input class="w3-input w3-border w3-round" type="text" value="1" placeholder="wallet ID" id="walletId">
               <input class="w3-button w3-ripple w3-blue" type="submit" value="Get Wallet">
             </form>
             <pre id="getWalletResult" style="display: none" class="w3-container w3-border w3-large"></pre>
